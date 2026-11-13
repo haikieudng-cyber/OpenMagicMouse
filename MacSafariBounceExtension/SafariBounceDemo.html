@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="vi" data-omm-demo="1">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenMagicMouse 2.2 — Thử Cuộn Quán Tính & Nảy Đàn Hồi Safari</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #181c26;
+      --border: #2a3142;
+      --text: #eef2ff;
+      --muted: #98a3bc;
+      --blue: #0a84ff;
+      --green: #30d158;
+      --amber: #ff9f0a;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.55;
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 28px 20px 64px;
+    }
+    .hero {
+      background: linear-gradient(145deg, #171d2c, #121622);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      background: rgba(255, 159, 10, 0.14);
+      border: 1px solid rgba(255, 159, 10, 0.45);
+      color: #ffd180;
+    }
+    .badge.active {
+      background: rgba(48, 209, 88, 0.15);
+      border-color: rgba(48, 209, 88, 0.5);
+      color: #8df5a6;
+    }
+    h1 {
+      margin: 14px 0 8px;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+    }
+    p.sub {
+      margin: 0;
+      color: var(--muted);
+    }
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .stat {
+      background: #111520;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stat-val {
+      margin-top: 4px;
+      font-size: 22px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--blue);
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 18px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: #fff;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn:hover { filter: brightness(1.08); }
+    code {
+      background: #0b0e15;
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 6px;
+      color: #9cdcfe;
+      font-size: 13px;
+    }
+    .spa-box {
+      height: 230px;
+      overflow-y: auto;
+      background: #10131c;
+      border: 1px solid #2f384e;
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .spa-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg {
+      background: #1b2232;
+      border: 1px solid #2b354d;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+    .filler-card {
+      background: #151923;
+      border: 1px solid #252c3d;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+    .filler-card h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div id="extBadge" class="badge">
+        🟠 Đang thử nghiệm riêng trên trang này — Làm 3 bước bên dưới (10 giây) để bật cho mọi trang web
+      </div>
+      <h1>Thử Cuộn Quán Tính Theo Lực &amp; Nảy Đàn Hồi Chuẩn Safari</h1>
+      <p class="sub">
+        Thử vuốt Magic Mouse 2 thật nhẹ (nhích từng dòng), rồi vẩy thật mạnh lên đỉnh trang hoặc xuống đáy trang để cảm nhận trang tự trôi dài theo lực và bật nảy đàn hồi.
+      </p>
+
+      <div class="hud">
+        <div class="stat">
+          <div class="stat-label">Độ nảy đàn hồi Safari</div>
+          <div id="bouncePx" class="stat-val">0.0 px</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Đỉnh nảy vừa đạt</div>
+          <div id="peakPx" class="stat-val">0.0 px</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Vị trí cuộn (scrollY)</div>
+          <div id="scrollPos" class="stat-val">0 px</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0;font-size:18px;">Bật hiệu ứng Nảy Bật Lại cho toàn bộ Chrome / Edge (chỉ làm 1 lần)</h2>
+      <ol style="margin: 10px 0 14px 20px; color: #d6deef;">
+        <li>Mở tab mới và vào <code>chrome://extensions</code> (hoặc <code>edge://extensions</code>).</li>
+        <li>Bật công tắc <strong>Developer mode</strong> (Chế độ dành cho nhà phát triển) ở góc trên bên phải.</li>
+        <li>Bấm <strong>Load unpacked</strong> (Tải tiện ích đã giải nén) và chọn thư mục Extension vừa copy đường dẫn. Mọi tab đang mở sẽ tự có hiệu ứng nảy ngay lập tức (không cần F5).</li>
+      </ol>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <button id="copyBtn" class="btn">📋 Copy đường dẫn thư mục Extension</button>
+        <span id="copyState" style="color: var(--muted); font-size: 13px;"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0;font-size:18px;">Khung cuộn lồng nhau (giả lập ChatGPT / Zalo Web / Facebook)</h2>
+      <p class="sub" style="margin-bottom:12px;">Đặt con trỏ vào khung bên dưới, cuộn xuống đáy hoặc lên đỉnh để kiểm tra hiệu ứng nảy riêng trong khung SPA.</p>
+      <div class="spa-box">
+        <div id="spaInner" class="spa-inner"></div>
+      </div>
+    </section>
+
+    <div id="cards"></div>
+  </div>
+
+  <script src="content.js"></script>
+  <script>
+    (() => {
+      function resolveExtensionDir() {
+        if (window.location.protocol === 'file:') {
+          let p = decodeURIComponent(window.location.pathname || '');
+          if (/^\/[A-Za-z]:/.test(p)) p = p.slice(1);
+          p = p.replace(/\/SafariBounceDemo\.html$/i, '').replace(/\//g, '\\');
+          if (p) return p;
+        }
+        return './MacSafariBounceExtension';
+      }
+      const EXT_DIR = resolveExtensionDir();
+      const badge = document.getElementById('extBadge');
+      const bounceEl = document.getElementById('bouncePx');
+      const peakEl = document.getElementById('peakPx');
+      const scrollEl = document.getElementById('scrollPos');
+      const copyBtn = document.getElementById('copyBtn');
+      const copyState = document.getElementById('copyState');
+      copyState.textContent = EXT_DIR;
+      let peak = 0;
+
+      function syncBadge() {
+        if (document.documentElement.dataset.ommExtActive === '1') {
+          badge.classList.add('active');
+          badge.textContent = '🟢 ĐÃ KÍCH HOẠT TOÀN TRÌNH DUYỆT: Mọi tab Chrome/Edge đã có Nảy Đàn Hồi Safari!';
+        }
+      }
+
+      syncBadge();
+      const obs = new MutationObserver(() => {
+        syncBadge();
+        const y = parseFloat(document.documentElement.dataset.ommBounceY || '0') || 0;
+        bounceEl.textContent = `${y.toFixed(1)} px`;
+        if (Math.abs(y) > Math.abs(peak)) {
+          peak = y;
+          peakEl.textContent = `${peak.toFixed(1)} px`;
+        }
+      });
+      obs.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-omm-bounce-y', 'data-omm-ext-active']
+      });
+
+      window.addEventListener('scroll', () => {
+        scrollEl.textContent = `${Math.round(window.scrollY)} px`;
+      }, { passive: true });
+
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(EXT_DIR);
+          copyState.innerHTML = '✅ Đã copy đường dẫn! Mở <code>chrome://extensions</code> → Developer mode → Load unpacked → Ctrl+V.';
+        } catch {
+          copyState.textContent = EXT_DIR;
+        }
+      });
+
+      const spaInner = document.getElementById('spaInner');
+      for (let i = 1; i <= 16; i++) {
+        const div = document.createElement('div');
+        div.className = 'msg';
+        div.textContent = `Tin nhắn thử nghiệm #${i} — Vuốt nhẹ để đọc từng dòng, vẩy mạnh để trôi nhanh và nảy bật ở đỉnh/đáy.`;
+        spaInner.appendChild(div);
+      }
+
+      const cards = document.getElementById('cards');
+      for (let i = 1; i <= 20; i++) {
+        const card = document.createElement('div');
+        card.className = 'filler-card';
+        card.innerHTML = `<h3>Đoạn thử quán tính #${i}</h3><p class="sub">Thử vẩy mạnh từ đây lên đầu trang hoặc xuống cuối trang. Khi trang chạm biên đang còn đà quán tính, nội dung sẽ giãn ra mượt mà và bật nảy về 0 px chuẩn Safari.</p>`;
+        cards.appendChild(card);
+      }
+    })();
+  </script>
+</body>
+</html>

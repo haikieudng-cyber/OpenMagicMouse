@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+*.pdb
+*.user
+*.suo
+.vs/
+.idea/
+/OpenMagicMouse.exe
+/OpenMagicMouse.dll
+/OpenMagicMouse.deps.json
+/OpenMagicMouse.runtimeconfig.json
+dist/

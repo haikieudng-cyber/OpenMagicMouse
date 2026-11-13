@@ -1,0 +1,80 @@
+name: Build, Test & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build OpenMagicMouse (Release)
+        run: dotnet build OpenMagicMouse/OpenMagicMouse.csproj -c Release
+
+      - name: Run C# offline self-tests
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:TEMP 'omm_ci_selftest.txt'
+          $p = Start-Process -FilePath 'OpenMagicMouse\bin\Release\net10.0-windows\OpenMagicMouse.exe' -ArgumentList '--selftest' -Wait -PassThru -NoNewWindow -RedirectStandardOutput $out
+          Get-Content $out
+          if ($p.ExitCode -ne 0) { exit $p.ExitCode }
+
+      - name: Run Safari bounce physics tests
+        run: node Tests/verify-safari-bounce.mjs
+
+      - name: Publish self-contained win-x64 bundle
+        shell: pwsh
+        run: |
+          dotnet publish OpenMagicMouse/OpenMagicMouse.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -o dist/OpenMagicMouse
+          Copy-Item Install-OpenMagicMouse.ps1, Uninstall-OpenMagicMouse.ps1, README.md, LICENSE dist/OpenMagicMouse/
+          Copy-Item AppleBootCampDriver, MacSafariBounceExtension dist/OpenMagicMouse/ -Recurse
+          Compress-Archive -Path dist/OpenMagicMouse/* -DestinationPath dist/OpenMagicMouse-win-x64.zip -Force
+
+      - name: Upload release zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenMagicMouse-win-x64
+          path: dist/OpenMagicMouse-win-x64.zip
+
+  release:
+    needs: build-and-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download release zip artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: OpenMagicMouse-win-x64
+          path: dist
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/OpenMagicMouse-win-x64.zip
+          generate_release_notes: true

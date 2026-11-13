@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "OpenMagicMouse — Safari Rubber-Band Bounce (macOS Overscroll)",
+  "version": "2.2.0",
+  "description": "Hiệu ứng cuộn chạm đỉnh/đáy trang nảy đàn hồi chuẩn Safari macOS cho Apple Magic Mouse 2.",
+  "permissions": ["scripting", "tabs"],
+  "host_permissions": ["http://*/*", "https://*/*", "file://*/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*", "file://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}
